@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BaseBallDao {
@@ -61,7 +62,7 @@ public class BaseBallDao {
     }
 
     //게임회차 및 팀별 랜덤 값 부여
-    void insertAnswer(TeamDto team) throws SQLException{
+    public void insertTeam(TeamDto team) throws SQLException{
         try(
                 Connection con = dbUtil.getConnection();
                 PreparedStatement pstmt = con.prepareStatement(
@@ -72,19 +73,87 @@ public class BaseBallDao {
                 );
         ){
             int idx = 0;
-            pstmt.setString(++idx, team.getGameCode());
+            pstmt.setInt(++idx, team.getGameCode());
             pstmt.setString(++idx, team.getTeam());
             pstmt.setString(++idx, team.getAnswer());
             pstmt.executeUpdate();
         }
     }
 
+    public String selectAnswer(TeamDto team) throws SQLException {
+        try(
+                Connection con = dbUtil.getConnection();
+                PreparedStatement pstmt = con.prepareStatement(
+                        " select answer from baseballgame_team where gameCode = ? and team = ? "
+                );
+        ){
+            pstmt.setInt(1, team.getGameCode());
+            pstmt.setString(2, team.getTeam());
+            ResultSet rs = pstmt.executeQuery();
+            if(rs.next()){
+               return rs.getString("answer");
+            }
+            return null;
+        }
+    }
 
-    //팀별 정답 입력
-    //팀별 로그 출력
-    List<LogDto> selectGameLog(String team) throws SQLException{
+    //사용자가 input던질 때 마다 count증가
+    public void updateCount(TeamDto team) throws SQLException{
+        try(
+                Connection con = dbUtil.getConnection();
+                PreparedStatement pstmt = con.prepareStatement(
+                        " update baseballgame_team set count = count+1 where gameCode = ? and team = ? "
+                );
+        ){
+            pstmt.setInt(1, team.getGameCode());
+            pstmt.setString(2, team.getTeam());
+            pstmt.executeUpdate();
+        }
+    }
 
+//    팀별 정답 입력
+    public void insertLog(LogDto log) throws SQLException{
+        try(
+                Connection con = dbUtil.getConnection();
+                PreparedStatement pstmt = con.prepareStatement(
+                        "insert into baseballgame_log (gameCode, team, input, result) " +
+                            " values " +
+                            " (?, ?, ?, ? )"
+                );
+        ){
+            int idx = 0;
+            pstmt.setInt(++idx, log.getGameCode());
+            pstmt.setString(++idx, log.getTeam());
+            pstmt.setString(++idx, log.getInput());
+            pstmt.setString(++idx, log.getResult());
+            pstmt.executeUpdate();
+        }
+    }
+
+    public List<TeamDto> selectGameResult(TeamDto team) throws SQLException{
+        List<TeamDto> list = new ArrayList<>();
+
+        try(
+                Connection con = dbUtil.getConnection();
+                PreparedStatement pstmt = con.prepareStatement(
+//                        " select * from baseballgame_log where team = ? and gameCode = ?  " +
+//                            " order by idx asc "
+                        " select * from baseballgame_team where gameCode = ?  "
+                );
+        ){
+            pstmt.setInt(1, team.getGameCode());
+            ResultSet rs = pstmt.executeQuery();
+            while(rs.next()){
+                TeamDto result = new TeamDto();
+                result.setGameCode(rs.getInt("gameCode"));
+                result.setTeam(rs.getString("team"));
+                result.setCount(rs.getInt("count"));
+                list.add(result);
+            }
+            System.out.println(list.size());
+            return list;
+        }
     }
     //팀별
-
 }
+

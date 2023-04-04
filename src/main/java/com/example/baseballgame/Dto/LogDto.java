@@ -1,18 +1,18 @@
 package com.example.baseballgame.Dto;
 
 public class LogDto {
-    String gameCode;
-    String team;
-    String input;
-    String result;
-
-    public String getGameCode() {
+    public int getGameCode() {
         return gameCode;
     }
 
-    public void setGameCode(String gameCode) {
+    public void setGameCode(int gameCode) {
         this.gameCode = gameCode;
     }
+
+    int gameCode;
+    String team;
+    String input;
+    String result;
 
     public String getTeam() {
         return team;

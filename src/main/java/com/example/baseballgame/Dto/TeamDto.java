@@ -1,19 +1,28 @@
 package com.example.baseballgame.Dto;
 
 public class TeamDto {
-    String gameCode;
+    int gameCode;
     String team;
     String answer;
-    String count;
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    int count;
 
     public TeamDto() {
     }
 
-    public String getGameCode() {
+    public int getGameCode() {
         return gameCode;
     }
 
-    public void setGameCode(String gameCode) {
+    public void setGameCode(int gameCode) {
         this.gameCode = gameCode;
     }
 
@@ -33,11 +42,4 @@ public class TeamDto {
         this.answer = answer;
     }
 
-    public String getCount() {
-        return count;
-    }
-
-    public void setCount(String count) {
-        this.count = count;
-    }
 }
